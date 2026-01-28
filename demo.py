@@ -51,7 +51,7 @@ def main():
     # 3. Demo 1: dir_filetype_stats (Shell Skill)
     print_section("Demo 1: Directory File Type Statistics (Shell Skill)")
 
-    user_input_1 = "统计 /Users/crisschan/workspace/claude_code_space 目录下的文件类型"
+    user_input_1 = "count file types in /Users/crisschan/workspace/claude_code_space directory"
     print(f"User Input: {user_input_1}\n")
 
     # 路由

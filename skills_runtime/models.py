@@ -115,6 +115,7 @@ class Skill(BaseModel):
 
 class SkillResult(BaseModel):
     """Skill 执行结果"""
+    trace_id: Optional[str] = None
     success: bool
     output: Optional[str] = None
     error: Optional[str] = None

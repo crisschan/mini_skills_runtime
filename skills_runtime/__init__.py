@@ -6,9 +6,10 @@ Skills Runtime - 本地 Skill 执行运行时
 - Skill 执行
 - 完整的 Trace 记录
 - 指标聚合
+- LLM 推理（LangChain + Ollama）
 """
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 
 from skills_runtime.models import (
     SkillExecutionTrace,
@@ -36,6 +37,12 @@ from skills_runtime.router import SkillRouter
 from skills_runtime.trace import TraceManager, TraceStorage
 from skills_runtime.state_machine import SkillRuntime
 from skills_runtime.metrics import MetricsAggregator
+from skills_runtime.llm import (
+    LLMConfig,
+    LLMManager,
+    skill_tool,
+)
+from skills_runtime.llm_state_machine import LLMSkillRuntime
 
 __all__ = [
     # Models
@@ -66,6 +73,11 @@ __all__ = [
     "TraceStorage",
     # State Machine
     "SkillRuntime",
+    "LLMSkillRuntime",
+    # LLM
+    "LLMConfig",
+    "LLMManager",
+    "skill_tool",
     # Metrics
     "MetricsAggregator",
 ]

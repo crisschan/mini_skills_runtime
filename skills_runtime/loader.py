@@ -2,12 +2,14 @@
 Skill 加载器
 
 负责从 SKILL.md 加载 Skill 定义
+支持 Claude Skills 规范的 YAML 格式
 """
 
 import os
 import re
 from pathlib import Path
 from typing import Optional, Dict, Any
+import yaml
 from skills_runtime.models import Skill, SkillMetadata, ExecutionPolicy
 
 
@@ -18,6 +20,7 @@ class SkillLoader:
     def load_from_markdown(skill_path: str) -> Skill:
         """
         从 SKILL.md 加载 Skill 定义
+        支持 Claude Skills 规范的 YAML 格式和旧的 Markdown 格式
 
         Args:
             skill_path: Skill 目录路径（包含 SKILL.md）
@@ -33,6 +36,54 @@ class SkillLoader:
         with open(skill_md_path, "r", encoding="utf-8") as f:
             content = f.read()
 
+        # 检测格式：如果以 apiVersion 开头，则是 YAML 格式
+        if content.strip().startswith("apiVersion:"):
+            return SkillLoader._load_from_yaml(content, skill_path)
+        else:
+            return SkillLoader._load_from_legacy_markdown(content, skill_path)
+
+    @staticmethod
+    def _load_from_yaml(content: str, skill_path: str) -> Skill:
+        """从 YAML 格式加载 Skill"""
+        try:
+            from skills_runtime.models import InputOutputField, PromptConfig, ExecutionPolicy, Routing, IOConfig, ToolConfig
+
+            data = yaml.safe_load(content)
+
+            # 手动转换嵌套对象以确保Pydantic正确解析
+            if 'metadata' in data and data['metadata']:
+                data['metadata'] = SkillMetadata(**data['metadata'])
+
+            if 'tools' in data and data['tools']:
+                data['tools'] = [ToolConfig(**tool) for tool in data['tools']]
+
+            if 'io' in data and data['io']:
+                inputs = []
+                outputs = []
+                if 'inputs' in data['io'] and data['io']['inputs']:
+                    inputs = [InputOutputField(**inp) for inp in data['io']['inputs']]
+                if 'outputs' in data['io'] and data['io']['outputs']:
+                    outputs = [InputOutputField(**out) for out in data['io']['outputs']]
+                data['io'] = IOConfig(inputs=inputs, outputs=outputs)
+
+            if 'routing' in data and data['routing']:
+                data['routing'] = Routing(**data['routing'])
+
+            if 'prompt' in data and data['prompt']:
+                data['prompt'] = PromptConfig(**data['prompt'])
+
+            if 'execution' in data and data['execution']:
+                data['execution'] = ExecutionPolicy(**data['execution'])
+
+            skill = Skill(**data)
+            skill.skill_path = skill_path
+            return skill
+        except Exception as e:
+            raise ValueError(f"Failed to parse YAML Skill definition: {e}")
+
+    @staticmethod
+    def _load_from_legacy_markdown(content: str, skill_path: str) -> Skill:
+        """从旧的 Markdown 格式加载 Skill（向后兼容）"""
         # 解析 Skill ID (从文件名或 SKILL.md)
         skill_id = os.path.basename(os.path.normpath(skill_path))
 

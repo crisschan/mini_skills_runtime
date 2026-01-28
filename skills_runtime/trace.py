@@ -183,6 +183,13 @@ class TraceStorage:
         """获取所有 Trace"""
         return self.traces
 
+    def get_trace(self, trace_id: str) -> Optional[SkillExecutionTrace]:
+        """根据 trace_id 获取 Trace"""
+        for trace in self.traces:
+            if trace.trace_id == trace_id:
+                return trace
+        return None
+
     def clear(self):
         """清空所有 Trace"""
         self.traces = []
