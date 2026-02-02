@@ -56,7 +56,7 @@ pip install -r requirements.txt
 ollama serve
 
 # 在另一个终端下载模型
-ollama pull qwen2.5:7b
+ollama pull qwen3:8b
 ```
 
 ### 3. 运行 Demo
@@ -81,13 +81,12 @@ python llm_demo.py
 ```
 
 展示：
-1. 使用 LLM 进行简单对话
-2. 加载 Skills
-3. LLM 理解用户意图并路由到合适的 Skill
-4. LLM 决定是否使用工具以及如何调用
-5. 执行工具并返回结果
-6. 完整的执行 Trace（包含 LLM 推理）
-7. 指标聚合分析
+1. 加载 Skills
+2. LLM 理解用户意图并路由到合适的 Skill
+3. LLM 决定是否使用工具以及如何调用
+4. 执行工具并返回结果
+5. 完整的执行 Trace（包含 LLM 推理）
+6. 指标聚合分析
 
 ## LLM 集成
 
@@ -98,7 +97,7 @@ from skills_runtime import LLMConfig, LLMSkillRuntime
 
 # 创建 LLM 配置
 llm_config = LLMConfig(
-    model="qwen2.5:7b",  # Ollama 模型名称
+    model="qwen3:8b",  # Ollama 模型名称
     temperature=0.7,          # 温度参数
     base_url=None,             # Ollama API 地址（默认 localhost:11434）
 )
@@ -117,6 +116,8 @@ response = runtime.simple_chat(
 )
 print(response)
 ```
+
+**注意**: `simple_chat` 方法仅用于演示 LLM 基础功能，实际项目中建议直接使用 Skill 执行流程。
 
 ### Skill 执行（带 LLM 推理）
 
@@ -245,7 +246,7 @@ EXECUTOR_REGISTRY["my_type"] = MyTypeExecutor
 
 ## 默认模型
 
-- **qwen2.5:7b**: 默认推荐模型，平衡性能和资源消耗
+- **qwen3:8b**: 默认推荐模型，平衡性能和资源消耗
 
 可通过 `LLMConfig` 修改为其他 Ollama 模型，如：
 - llama3:8b
